@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/*
+  busca-vzla — Sistema de diseño "Accessible & Ethical" (UI/UX Pro Max)
+  WCAG AAA, alto contraste, sin ruido decorativo. Sin gradientes morado/rosa tipo IA.
+  El color NUNCA es el único indicador de estado (siempre ícono + texto).
+*/
+@theme {
+  /* Marca / superficie */
+  --color-background: #f8fafc; /* slate-50  */
+  --color-surface: #ffffff;
+  --color-foreground: #020617; /* slate-950 — texto principal */
+  --color-muted: #475569;      /* slate-600 — texto secundario (contraste AA+) */
+  --color-border: #e2e8f0;     /* slate-200 */
+
+  --color-primary: #0f172a;    /* slate-900 */
+  --color-secondary: #334155;  /* slate-700 */
+  --color-accent: #0369a1;     /* sky-700 — CTA, confianza */
+  --color-accent-fg: #ffffff;
+
+  /* Estados de persona (mapean a persona_status) */
+  --color-status-desaparecido: #d97706; /* ámbar  */
+  --color-status-vivo: #16a34a;          /* verde  */
+  --color-status-fallecido: #475569;     /* slate  */
+  --color-status-info: #0369a1;          /* azul   */
+
+  /* Aviso anti-estafa / peligro */
+  --color-danger: #b91c1c;
+  --color-danger-bg: #fef2f2;
+
+  /* Tipografía (variables inyectadas por next/font en layout.tsx) */
+  --font-sans: var(--font-source-sans), system-ui, sans-serif;
+  --font-display: var(--font-lexend), system-ui, sans-serif;
+
+  --radius: 0.625rem;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-size: 16px; /* mínimo legible en móvil */
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  /* Focus visible siempre (a11y, navegación por teclado) */
+  :focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Respeta prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Utilidad: salto al contenido para lectores de pantalla / teclado */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  background: var(--color-primary);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+}
