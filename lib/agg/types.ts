@@ -11,6 +11,7 @@ export type ItemType =
   | "news" // noticia (enlace + titular + extracto; nunca texto completo)
   | "resource" // recurso/albergue/servicio
   | "donation_appeal" // llamamiento de donación (link-only)
+  | "zone_signal" // señal agregada y anonimizada ligada a una zona gruesa (Puente VE)
   | "missing_person"; // puntero a registro de personas (enlace + conteo, SIN PII)
 
 /** 1 = oficial/autoritativo … 4 = social sin verificar. */

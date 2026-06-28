@@ -1,6 +1,7 @@
 import type { AggItem } from "../types";
 import { sources } from "../sources";
 import { canonicalizeUrl, contentHash, recordId } from "../normalize";
+import { reliefwebAppname } from "@/lib/env";
 
 /*
   ReliefWeb v2 (UN OCHA). Requiere un appname APROBADO (registrar en
@@ -20,7 +21,7 @@ type RwReport = {
 };
 
 export async function fetchReliefWeb(fetchedAt: string): Promise<AggItem[]> {
-  const appname = process.env.RELIEFWEB_APPNAME;
+  const appname = reliefwebAppname;
   if (!appname) return []; // gated: sin appname aprobado no se ingiere
 
   const src = sources.reliefweb;

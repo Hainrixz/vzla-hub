@@ -26,11 +26,24 @@
 
   /* Aviso anti-estafa / peligro */
   --color-danger: #b91c1c;
+  --color-danger-hover: #991b1b; /* rojo más oscuro para hover de CTAs de emergencia */
   --color-danger-bg: #fef2f2;
+
+  /* Superficies y bordes extra (estética status-page: hairlines + datos mono) */
+  --color-surface-2: #f1f5f9;     /* slate-100 — bloques de código, chips, filas inset */
+  --color-border-strong: #cbd5e1; /* slate-300 — hover/activo de chips y filtros */
+
+  /* Estado de partners en el directorio (color + texto + ícono, nunca solo color) */
+  --color-live: #16a34a;       /* verde     */
+  --color-beta: #0369a1;       /* azul (= accent) */
+  --color-prototype: #d97706;  /* ámbar     */
+  --color-idea: #64748b;       /* slate-500 */
+  --color-directory: #94a3b8;  /* slate-400 */
 
   /* Tipografía (variables inyectadas por next/font en layout.tsx) */
   --font-sans: var(--font-source-sans), system-ui, sans-serif;
   --font-display: var(--font-lexend), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
 
   --radius: 0.625rem;
 }
@@ -83,6 +96,9 @@
   top: 1rem;
   background: var(--color-primary);
   color: #fff;
-  padding: 0.75rem 1rem;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
   border-radius: var(--radius);
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
 }

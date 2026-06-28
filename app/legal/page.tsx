@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Aviso legal — busca-vzla",
   description:
     "Aviso legal de busca-vzla: no es un canal oficial, nunca pedimos dinero, y cómo solicitar la retirada de datos.",
 };
+
+// TODO: reemplazar por un buzón real y monitoreado (gate G0 del buscador).
+const CONTACT = "privacidad@busca-vzla.org";
 
 export default function LegalPage() {
   return (
@@ -38,10 +42,26 @@ export default function LegalPage() {
         <section>
           <h2 className="text-lg font-bold text-[var(--color-primary)]">Privacidad y retirada de datos</h2>
           <p className="mt-2 text-sm">
-            Cuando se active el reporte de personas, se podrá solicitar la retirada
-            o corrección de cualquier dato sin necesidad de iniciar sesión, en
-            ejercicio del derecho de hábeas data. Minimizamos los datos: no pedimos
-            datos médicos ni de identificación.
+            En ejercicio del derecho de hábeas data, cualquier persona puede pedir
+            conocer, rectificar o suprimir su información, sin necesidad de iniciar
+            sesión. Minimizamos los datos y no concentramos PII. Detalles en la{" "}
+            <Link href="/privacidad" className="font-medium text-[var(--color-accent)] hover:underline">
+              política de privacidad
+            </Link>{" "}
+            y los{" "}
+            <Link href="/terminos" className="font-medium text-[var(--color-accent)] hover:underline">
+              términos de la API
+            </Link>
+            .
+          </p>
+          <p className="mt-3 text-sm">
+            Canal de contacto y retirada:{" "}
+            <a
+              href={`mailto:${CONTACT}?subject=Solicitud%20de%20retirada`}
+              className="font-medium text-[var(--color-accent)] hover:underline"
+            >
+              {CONTACT}
+            </a>
           </p>
         </section>
 

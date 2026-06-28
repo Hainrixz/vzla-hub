@@ -2,13 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ShieldCheck, ArrowRight } from "lucide-react";
 import { DonationCard } from "@/components/DonationCard";
+import { AggItemCard } from "@/components/AggItemCard";
 import { InfoAccordion } from "@/components/InfoAccordion";
 import { Section } from "@/components/Section";
+import { getItems } from "@/lib/agg/aggregate";
 import {
   donacionesVigentes,
   TIER_LABEL,
   type Tier,
 } from "@/lib/donations";
+
+// ISR: refresca los llamamientos agregados de la comunidad cada 5 min.
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Donar — busca-vzla",
@@ -26,8 +31,9 @@ function fechaCorta(iso: string) {
   }).format(new Date(iso + "T00:00:00Z"));
 }
 
-export default function DonarPage() {
+export default async function DonarPage() {
   const vigentes = donacionesVigentes(new Date());
+  const { items: comunidad } = await getItems({ type: "donation_appeal", limit: 12 });
 
   return (
     <main
@@ -97,6 +103,20 @@ export default function DonarPage() {
           );
         })}
       </div>
+
+      {comunidad.length > 0 && (
+        <Section
+          id="comunidad"
+          titulo="Llamamientos de la comunidad"
+          descripcion="Agregados de plataformas aliadas (atribuido, no verificado por nosotros). Confirma siempre el destino en el sitio oficial antes de donar."
+        >
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {comunidad.map((it) => (
+              <AggItemCard key={it.id} item={it} />
+            ))}
+          </ul>
+        </Section>
+      )}
     </main>
   );
 }

@@ -22,3 +22,7 @@ export async function GET() {
     { headers: { "cache-control": "public, s-maxage=3600" } }
   );
 }
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204 });
+}

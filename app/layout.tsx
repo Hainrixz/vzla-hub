@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Lexend, Source_Sans_3 } from "next/font/google";
+import { Lexend, Source_Sans_3, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppBar } from "@/components/AppBar";
 import { BottomDock } from "@/components/BottomDock";
@@ -19,12 +19,38 @@ const sourceSans = Source_Sans_3({
   display: "swap",
 });
 
+// Mono para datos/código y la estética status-page (un solo archivo variable, 2G-friendly).
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const SITE_DESC =
+  "Punto de encuentro para buscar personas desaparecidas, donar, ayudar y encontrar recursos tras el sismo en Venezuela. Reúne plataformas y canales oficiales en un solo lugar.";
+
 export const metadata: Metadata = {
-  title: "busca-vzla — HUB de ayuda (sismo Venezuela 2026)",
-  description:
-    "Punto de encuentro para buscar personas desaparecidas, donar, ayudar y encontrar recursos tras el sismo en Venezuela. Reúne plataformas y canales oficiales en un solo lugar.",
+  metadataBase: new URL("https://busca-vzla.org"),
+  title: {
+    default: "busca-vzla — HUB de ayuda (sismo Venezuela 2026)",
+    template: "%s",
+  },
+  description: SITE_DESC,
   applicationName: "busca-vzla",
   robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    locale: "es_VE",
+    siteName: "busca-vzla",
+    title: "busca-vzla — HUB de ayuda (sismo Venezuela 2026)",
+    description: SITE_DESC,
+    url: "https://busca-vzla.org",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "busca-vzla — HUB de ayuda (sismo Venezuela 2026)",
+    description: SITE_DESC,
+  },
 };
 
 export const viewport: Viewport = {
@@ -41,7 +67,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${lexend.variable} ${sourceSans.variable} h-full`}
+      className={`${lexend.variable} ${sourceSans.variable} ${geistMono.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-[var(--color-background)]">
         <a href="#contenido" className="skip-link">

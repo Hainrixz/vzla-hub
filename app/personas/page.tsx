@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
-import { Construction } from "lucide-react";
 import { EnlaceCard } from "@/components/EnlaceCard";
 import { Section } from "@/components/Section";
+import { PersonSearch } from "@/components/PersonSearch";
 import { plataformas, canalesOficiales } from "@/lib/links";
+import { publicPartners } from "@/lib/partners";
+import { personSearchOn } from "@/lib/env";
+
+// Plataformas de personas del registro que NO están ya en lib/links.ts (cobertura:
+// que aparezcan todas en /personas, no solo en el directorio /aplicaciones).
+const YA_LISTADAS = new Set(["desaparecidos_terremoto_ve", "venezuela_te_busca"]);
+const masPlataformas = publicPartners()
+  .filter((p) => p.area === "personas" && p.homepage && !YA_LISTADAS.has(p.id))
+  .map((p) => ({ nombre: p.name, descripcion: p.description, url: p.homepage }));
 
 export const metadata: Metadata = {
   title: "Buscar personas — busca-vzla",
@@ -25,16 +34,8 @@ export default function PersonasPage() {
         te encuentren.
       </p>
 
-      <div className="mt-4 flex items-start gap-3 rounded-[var(--radius)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-        <Construction
-          className="size-5 shrink-0 mt-0.5 text-[var(--color-status-desaparecido)]"
-          aria-hidden="true"
-        />
-        <p className="text-sm text-[var(--color-muted)]">
-          El reporte propio con mapa y fotos está en construcción y se activará
-          cuando esté listo de forma segura (sin exponer datos personales). Por
-          ahora, estas plataformas ya te permiten buscar y reportar.
-        </p>
+      <div className="mt-4">
+        <PersonSearch enabled={personSearchOn} />
       </div>
 
       <Section
@@ -48,6 +49,20 @@ export default function PersonasPage() {
           ))}
         </ul>
       </Section>
+
+      {masPlataformas.length > 0 && (
+        <Section
+          id="mas-plataformas"
+          titulo="Más plataformas de búsqueda"
+          descripcion="Otros proyectos de la comunidad registrados en el HUB. Algunos manejan datos sensibles: trátalos con cuidado."
+        >
+          <ul className="grid gap-4 sm:grid-cols-2">
+            {masPlataformas.map((p) => (
+              <EnlaceCard key={p.nombre} enlace={p} />
+            ))}
+          </ul>
+        </Section>
+      )}
 
       <Section
         id="oficiales"

@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# busca-vzla
 
-## Getting Started
+HUB consolidador + API pública para la crisis del **sismo de Venezuela (2026)**:
+buscar personas, donar con seguridad, ofrecer ayuda y **conectar las apps
+comunitarias** para que la información esté en un solo lugar.
 
-First, run the development server:
+> Maneja PII de víctimas de desastre. La privacidad y la corrección son seguridad
+> de vida. Ver las reglas no negociables en [`CLAUDE.md`](./CLAUDE.md).
+
+## Qué es
+
+- **Directorio** (`/aplicaciones`): registro neutral de los proyectos de la
+  comunidad. Cada uno es responsable de sus datos; aquí se reúnen.
+- **API pública** (`/api/v1`): el producto. Datos agregados NO-PII con procedencia
+  en cada item, CORS abierto y caché en CDN. La consume el propio hub.
+- **Estándar común** (PFIF): esquema para que las apps de personas se conecten.
+- **Buscador de personas**: proxy de paso **construido pero APAGADO** tras gates
+  de seguridad (no almacena PII; ver más abajo).
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · TypeScript strict · Tailwind v4 ·
+lucide-react · zod · fast-xml-parser · vitest.
+
+## Desarrollo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # servidor de desarrollo (Turbopack)
+npm run build      # build de producción
+npm run validate   # typecheck + lint + tests
+npm test           # solo tests (vitest)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## API pública (`/api/v1`)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Endpoint | Descripción |
+|---|---|
+| `GET /api/v1` | Índice: lista de endpoints + enlaces legales |
+| `GET /api/v1/items` | Items agregados. Filtros: `type`, `source`, `lat`/`lng`/`radiusKm`, `limit` (máx 200), `offset` |
+| `GET /api/v1/sources` | Fuentes técnicas y sus tiers de confianza |
+| `GET /api/v1/partners` | Directorio de proyectos conectados (sin PII) |
+| `GET /api/v1/stats` | Conteos por tipo y por fuente |
+| `GET /api/v1/interop/schema` | Esquema común PFIF para apps de personas |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Cada item lleva un bloque `provenance` (fuente, fecha, método, licencia, tier) y
+un enlace de origen. **Atribuir, no aseverar**: nunca presentamos un dato como
+verificado por nosotros si no lo es.
 
-## Learn More
+```bash
+curl "https://busca-vzla.org/api/v1/items?type=official_alert&limit=5"
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Planos de datos (regla dura)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **`agg`** (público, SIN PII): el motor `lib/agg/`. Una regla de ESLint impide que
+  importe del plano `app`. Un guard anti-PII de dos capas descarta cualquier item
+  con email/teléfono/cédula/datos financieros.
+- **`app`** (PII): el buscador de personas vive en `lib/interop/` + `app/api/persons/`,
+  **fuera** de `/api/v1`, same-origin, fail-closed. Apagado por defecto.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Variables de entorno
 
-## Deploy on Vercel
+Ver [`.env.example`](./.env.example). Todas son opcionales con **defaults seguros
+(apagado)**:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `PERSON_SEARCH_PROXY` — interruptor del buscador de personas (default `off`).
+- `PUENTE_VE_URL` / `PUENTE_VE_ANON_KEY` — partner Puente VE (señales de zona).
+- `RELIEFWEB_APPNAME` — adapter de ReliefWeb (UN OCHA).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Encender el buscador de personas exige cerrar los gates G0–G7 (legal publicado,
+acuerdo firmado por partner, rate-limit real con Upstash + Turnstile, exclusión de
+salud/menores/biométrico). Ver el plan del proyecto.
+
+## Tests
+
+`vitest` cubre el motor (`getItems` y sus invariantes de seguridad), los adapters
+(con fixtures), el guard anti-PII, la normalización, los schemas, el registro de
+partners y el buscador de personas.
+
+```bash
+npm test
+```

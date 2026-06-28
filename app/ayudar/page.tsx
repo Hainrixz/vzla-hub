@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { HandCoins, Droplet, Users, Package, ArrowRight } from "lucide-react";
 import { Section } from "@/components/Section";
+import { AggItemCard } from "@/components/AggItemCard";
+import { getItems } from "@/lib/agg/aggregate";
+
+// ISR: refresca los recursos agregados de la comunidad cada 5 min.
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Cómo ayudar — busca-vzla",
@@ -30,7 +35,8 @@ const formas: { icon: typeof HandCoins; titulo: string; texto: string }[] = [
   },
 ];
 
-export default function AyudarPage() {
+export default async function AyudarPage() {
+  const { items: comunidad } = await getItems({ type: "resource", limit: 12 });
   return (
     <main
       id="contenido"
@@ -89,6 +95,20 @@ export default function AyudarPage() {
           })}
         </ul>
       </Section>
+
+      {comunidad.length > 0 && (
+        <Section
+          id="comunidad"
+          titulo="Recursos de la comunidad"
+          descripcion="Agregados de plataformas aliadas (atribuido, no verificado por nosotros). Verifica en la fuente antes de actuar."
+        >
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {comunidad.map((it) => (
+              <AggItemCard key={it.id} item={it} />
+            ))}
+          </ul>
+        </Section>
+      )}
     </main>
   );
 }

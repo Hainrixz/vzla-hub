@@ -5,13 +5,16 @@ import type { ItemType } from "@/lib/agg/types";
 // La API pública es el producto; el hub es su primer consumidor.
 export const revalidate = 300;
 
+// `missing_person` NO se expone en el plano público hasta que exista el núcleo
+// seguro (gate REAL_DATA_INTAKE). Ningún adapter habilitado lo emite (ver
+// invariante en lib/agg/aggregate.ts).
 const TYPES = new Set<ItemType>([
   "official_alert",
   "situation_report",
   "news",
   "resource",
   "donation_appeal",
-  "missing_person",
+  "zone_signal",
 ]);
 
 export async function GET(req: NextRequest) {
@@ -23,6 +26,9 @@ export async function GET(req: NextRequest) {
 
   const source = sp.get("source");
   if (source) filter.source = source;
+
+  const q = sp.get("q");
+  if (q && q.trim()) filter.q = q.trim().slice(0, 80);
 
   const limit = sp.get("limit");
   if (limit && Number.isFinite(Number(limit))) filter.limit = parseInt(limit, 10);
@@ -57,4 +63,9 @@ export async function GET(req: NextRequest) {
       { status: 502 }
     );
   }
+}
+
+// Preflight CORS (los headers Access-Control-* los aplica next.config.ts).
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204 });
 }

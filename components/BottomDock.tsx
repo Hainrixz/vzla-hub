@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navItems } from "@/lib/nav";
+import { dockNav } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 /**
@@ -19,7 +19,7 @@ export function BottomDock() {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="mx-auto flex max-w-3xl items-stretch justify-around">
-        {navItems.map((item) => {
+        {dockNav.map((item) => {
           const active =
             item.href === "/"
               ? pathname === "/"
@@ -31,7 +31,7 @@ export function BottomDock() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex min-h-[56px] flex-col items-center justify-center gap-0.5 px-1 py-1.5 text-[11px] font-medium transition-colors duration-200 cursor-pointer",
+                  "flex min-h-[56px] flex-col items-center justify-center gap-0.5 px-1 py-1.5 text-xs font-medium transition-colors duration-200 cursor-pointer",
                   active
                     ? "text-[var(--color-accent)]"
                     : "text-[var(--color-muted)] hover:text-[var(--color-primary)]"
@@ -46,7 +46,7 @@ export function BottomDock() {
                 <span
                   aria-hidden="true"
                   className={cn(
-                    "mt-0.5 h-0.5 w-6 rounded-full",
+                    "mt-0.5 h-1 w-6 rounded-full",
                     active ? "bg-[var(--color-accent)]" : "bg-transparent"
                   )}
                 />

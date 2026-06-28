@@ -7,7 +7,13 @@ import type { IngestMethod, TrustTier } from "./types";
   personas jamás por scraping.
 */
 
-export type SourceClass = "official_api" | "official_feed" | "news" | "social" | "scrape";
+export type SourceClass =
+  | "official_api"
+  | "official_feed"
+  | "news"
+  | "social"
+  | "scrape"
+  | "partner_api";
 
 export type Source = {
   id: string;
@@ -21,6 +27,11 @@ export type Source = {
   tosOk: boolean;
   loginRequired: boolean; // debe ser false para ingerir (regla sin-login)
   needsBrowser: boolean;
+  /** Para partners: acuerdo de datos confirmado. Si false, no ingiere aunque enabled. */
+  partnerAgreement?: boolean;
+  verifiedBy?: string;
+  verifiedAt?: string;
+  verificationMethod?: "dns-txt" | "repo-file" | "email-domain";
   lastVerified: string; // ISO date
   enabled: boolean; // false = listo pero apagado (p.ej. falta appname)
   note?: string;
@@ -73,8 +84,50 @@ export const sources: Record<string, Source> = {
     enabled: false, // requiere un appname aprobado (RELIEFWEB_APPNAME) — registrar en apidoc.reliefweb.int
     note: "API v2 exige appname aprobado. Se habilita al definir RELIEFWEB_APPNAME.",
   },
+  // --- Partners comunitarios (NO-PII) ---
+  venezuela_solidaria: {
+    id: "venezuela_solidaria",
+    name: "Venezuela Solidaria",
+    homepage: "https://www.venezuelasolidaria.com/",
+    class: "partner_api",
+    license: "Partner — Venezuela Solidaria (CORS abierto)",
+    trustTier: 2,
+    method: "partner",
+    robotsOk: true,
+    tosOk: true,
+    loginRequired: false,
+    needsBrowser: false,
+    partnerAgreement: true,
+    lastVerified: "2026-06-27",
+    enabled: true,
+    note: "GET público de recursos (donaciones/páginas/emergencia/quedadas).",
+  },
+  puente_ve: {
+    id: "puente_ve",
+    name: "Puente VE",
+    homepage: "https://github.com/Fredoale/puente-ve",
+    class: "partner_api",
+    license: "Partner — Puente VE (stats anonimizadas)",
+    trustTier: 2,
+    method: "partner",
+    robotsOk: true,
+    tosOk: true,
+    loginRequired: false,
+    needsBrowser: false,
+    partnerAgreement: true,
+    lastVerified: "2026-06-27",
+    enabled: false, // gated por env: requiere PUENTE_VE_URL + PUENTE_VE_ANON_KEY
+    note: "RPC anonimizadas. Se habilita al definir PUENTE_VE_URL y PUENTE_VE_ANON_KEY.",
+  },
 };
 
 export function enabledSources(): Source[] {
-  return Object.values(sources).filter((s) => s.enabled && s.tosOk && s.robotsOk && !s.loginRequired);
+  return Object.values(sources).filter(
+    (s) =>
+      s.enabled &&
+      s.tosOk &&
+      s.robotsOk &&
+      !s.loginRequired &&
+      (s.partnerAgreement ?? true) // belt-and-suspenders para partners
+  );
 }

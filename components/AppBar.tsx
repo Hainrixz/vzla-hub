@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Search, Phone } from "lucide-react";
-import { navItems } from "@/lib/nav";
+import { Search, Phone, Plug } from "lucide-react";
+import { headerNav } from "@/lib/nav";
 
 /**
  * Barra superior. En móvil: logo + acceso rápido a Emergencias.
@@ -23,7 +23,7 @@ export function AppBar() {
         </Link>
 
         <nav aria-label="Secciones" className="hidden lg:flex lg:items-center lg:gap-1">
-          {navItems.map((item) => (
+          {headerNav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -34,13 +34,23 @@ export function AppBar() {
           ))}
         </nav>
 
-        <a
-          href="tel:911"
-          className="inline-flex min-h-[40px] items-center gap-1.5 rounded-[var(--radius)] bg-[var(--color-danger)] px-3 py-1.5 text-sm font-semibold text-white transition-colors duration-200 hover:brightness-110 cursor-pointer"
-        >
-          <Phone className="size-4" aria-hidden="true" />
-          Emergencia 911
-        </a>
+        <div className="flex items-center gap-2">
+          {/* Invitación "abre tus puertas" — discreta, no compite con el 911. */}
+          <Link
+            href="/conectar"
+            className="hidden sm:inline-flex min-h-[40px] items-center gap-1.5 rounded-[var(--radius)] border border-[var(--color-border-strong)] px-3 py-1.5 text-sm font-semibold text-[var(--color-secondary)] transition-colors duration-200 hover:bg-[var(--color-background)] cursor-pointer"
+          >
+            <Plug className="size-4" aria-hidden="true" />
+            Conectar
+          </Link>
+          <a
+            href="tel:911"
+            className="inline-flex min-h-[40px] items-center gap-1.5 rounded-[var(--radius)] bg-[var(--color-danger)] px-3 py-1.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[var(--color-danger-hover)] cursor-pointer"
+          >
+            <Phone className="size-4" aria-hidden="true" />
+            Emergencia 911
+          </a>
+        </div>
       </div>
     </header>
   );

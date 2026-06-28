@@ -1,5 +1,14 @@
 import { ExternalLink, BadgeCheck, Clock } from "lucide-react";
-import type { AggItem } from "@/lib/agg/types";
+import type { AggItem, ItemType } from "@/lib/agg/types";
+
+const TYPE_LABEL: Partial<Record<ItemType, string>> = {
+  official_alert: "Alerta",
+  situation_report: "Reporte",
+  news: "Noticia",
+  resource: "Recurso",
+  donation_appeal: "Donación",
+  zone_signal: "Señal de zona",
+};
 
 function relativo(iso: string): string {
   const then = new Date(iso).getTime();
@@ -22,13 +31,25 @@ export function AggItemCard({ item }: { item: AggItem }) {
           <BadgeCheck className="size-3.5 text-[var(--color-status-vivo)]" aria-hidden="true" />
           {item.provenance.sourceName}
         </span>
-        {item.trustTier === 1 && (
+        {TYPE_LABEL[item.type] && (
+          <span className="rounded-full border border-[var(--color-border)] px-2 py-0.5 text-[var(--color-muted)]">
+            {TYPE_LABEL[item.type]}
+          </span>
+        )}
+        {item.trustTier === 1 ? (
           <span className="rounded-full border border-[var(--color-border)] px-2 py-0.5 text-[var(--color-muted)]">
             Oficial
           </span>
+        ) : (
+          <span className="rounded-full border border-[var(--color-border)] px-2 py-0.5 text-[var(--color-muted)]">
+            Atribuido · sin verificar
+          </span>
         )}
         {typeof mag === "number" && (
-          <span className="rounded-full bg-[var(--color-danger-bg)] px-2 py-0.5 font-semibold text-[var(--color-danger)]">
+          <span
+            className="rounded-full bg-[var(--color-danger-bg)] px-2 py-0.5 font-semibold text-[var(--color-danger)]"
+            aria-label={`Magnitud ${mag}`}
+          >
             M{mag}
           </span>
         )}
@@ -47,13 +68,25 @@ export function AggItemCard({ item }: { item: AggItem }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-start gap-1.5 font-semibold text-[var(--color-primary)] hover:text-[var(--color-accent)] hover:underline cursor-pointer"
+        lang={item.lang}
+        className="inline-flex min-h-[44px] items-start gap-1.5 py-1 font-semibold text-[var(--color-primary)] hover:text-[var(--color-accent)] hover:underline cursor-pointer"
       >
         {item.title}
         <ExternalLink className="mt-1 size-3.5 shrink-0" aria-hidden="true" />
       </a>
       {item.summary && (
         <p className="text-sm text-[var(--color-muted)]">{item.summary}</p>
+      )}
+      {item.type === "zone_signal" && (
+        <p className="text-sm text-[var(--color-muted)]">
+          {typeof item.extra?.count === "number" ? `${item.extra.count} señales` : null}
+          {item.extra?.dominantType ? ` · necesidad: ${item.extra.dominantType}` : null}
+        </p>
+      )}
+      {item.type === "donation_appeal" && (
+        <p className="text-xs text-[var(--color-muted)]">
+          Verifica el destino en el sitio oficial antes de donar.
+        </p>
       )}
       <p className="text-xs text-[var(--color-muted)]">
         Atribuido a {item.provenance.sourceName} · {item.provenance.license}
