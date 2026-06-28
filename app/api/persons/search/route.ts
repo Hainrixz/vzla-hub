@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { federatedPersonSearch } from "@/lib/interop/person-finders";
 import { personSearchOn } from "@/lib/env";
 import { rateLimit } from "@/lib/ratelimit";
+import { clientIp } from "@/lib/client-ip";
 
 /*
   Buscador federado de personas — PROXY DE PASO.
@@ -41,13 +42,9 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // Rate-limit por IP. EN MEMORIA = ok para un solo nodo/dev; en serverless
-  // multi-instancia usar Upstash (mismo contrato) — ver lib/ratelimit.ts.
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "local";
-  if (!rateLimit(`persons:${ip}`).ok) {
+  // Rate-limit por IP de confianza. EN MEMORIA = ok para un solo nodo/dev; en
+  // serverless multi-instancia usar Upstash (mismo contrato) — ver lib/ratelimit.ts.
+  if (!rateLimit(`persons:${clientIp(req)}`).ok) {
     return NextResponse.json(
       { error: "rate_limited", message: "Demasiadas búsquedas seguidas. Espera un momento." },
       { status: 429, headers: SECURE_HEADERS }
